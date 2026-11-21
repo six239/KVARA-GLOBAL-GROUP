@@ -1,0 +1,10 @@
+name = "kvaraglobalgroup"
+main = "worker/index.ts"
+compatibility_date = "2026-11-21"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+# Cloudflare bindings will be added after we inspect the current account resources.
+# Do not put secrets in this file or in GitHub.
