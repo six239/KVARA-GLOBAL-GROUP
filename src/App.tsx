@@ -86,6 +86,7 @@ export default function App() {
     img.src = editImage;
   }
   const [sidebar, setSidebar] = useState(() => window.innerWidth > 560);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const t = copy[lang];
 
   function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }
@@ -106,9 +107,10 @@ export default function App() {
       <header className="topbar">
         <button className="icon-button mobile-menu" onClick={() => setSidebar(!sidebar)} aria-label="Toggle menu"><Menu size={20}/></button>
         <div className="crumb">Kvara Global <span>/</span> {t[section]}</div>
-        <div className="top-actions"><Globe2 size={16}/><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)} aria-label="Language"><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select><div className="avatar">K</div></div>
+        <div className="top-actions"><button className="get-app-button" onClick={() => setCheckoutOpen(true)}>Get the app · 7₾</button><Globe2 size={16}/><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)} aria-label="Language"><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select><div className="avatar">K</div></div>
       </header>
-      <div className="content">
+      {checkoutOpen && <div className="checkout-backdrop" role="presentation" onClick={() => setCheckoutOpen(false)}><section className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onClick={e => e.stopPropagation()}><button className="checkout-close" onClick={() => setCheckoutOpen(false)} aria-label="Close checkout">×</button><div className="checkout-brand">KVARA GLOBAL</div><div className="checkout-secure">SECURE CHECKOUT</div><h2 id="checkout-title">Complete your purchase</h2><p className="checkout-description">Kvara Global Group app download</p><div className="checkout-total"><span>Total</span><strong>7.00₾</strong></div><div className="checkout-method"><span className="checkout-bank-mark">B</span><span><b>Bank of Georgia</b><small>Pay securely through Bank of Georgia</small></span><span className="checkout-selected">Selected</span></div><button className="primary checkout-continue" disabled>Continue to payment</button><p className="checkout-disclaimer">Online payments are not connected yet. No payment will be collected from this preview.</p></section></div>}
+        <div className="content">
         {section === "webora" && <section className="hero">
           <div className="eyebrow"><Sparkles size={14}/> AI WEBSITE STUDIO</div>
           <h1>{t.welcome}</h1><p className="subtitle">{t.sub}</p>
