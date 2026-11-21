@@ -137,7 +137,7 @@ export default function App() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || `Generation failed (${response.status})`);
       if (typeof data.html !== "string" || !data.html.includes("<")) throw new Error("The generator returned an invalid website. Please try again.");
-      const title = String(data.title || data.html.match(/<title[^>]*>(.*?)<\\/title>/i)?.[1] || prompt.trim().slice(0, 48));
+      const title = String(data.title || data.html.match(/<title[^>]*>(.*?)<\/title>/i)?.[1] || prompt.trim().slice(0, 48));
       setGeneratedHtml(data.html);
       setGeneratedTitle(title);
       const project = { id: String(Date.now()), title, html: data.html, createdAt: new Date().toISOString() };
