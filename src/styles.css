@@ -11,3 +11,12 @@
 .shell.flag-bg-en::before{background-image:url("https://flagcdn.com/w1600/us.png")}
 .shell.flag-bg-ru::before{background-image:url("https://flagcdn.com/w1600/ru.png")}
 .sidebar,.main{position:relative;z-index:1}
+
+.kvara-title-row{display:flex;align-items:center;gap:12px}
+.kvara-title-row h1{margin:18px 0 13px}
+.kvara-switcher{position:relative;display:inline-flex;align-items:center}
+.kvara-switch-button{width:36px;height:36px;border:1px solid #a17bda55;border-radius:10px;background:#8b58e51c;color:#d9c4ff;display:grid;place-items:center;cursor:pointer}
+.kvara-switch-button:hover{background:#8b58e533}
+.kvara-menu{position:absolute;top:44px;left:0;z-index:10;min-width:170px;padding:6px;border:1px solid #a17bda55;border-radius:12px;background:#151020;box-shadow:0 14px 35px #0009;display:grid;gap:3px}
+.kvara-menu button{border:0;border-radius:8px;background:transparent;color:#d9d0e9;padding:10px;display:flex;align-items:center;gap:9px;text-align:left;font-size:12px;cursor:pointer}
+.kvara-menu button:hover{background:#8b58e533;color:#fff}
