@@ -6,5 +6,12 @@ compatibility_date = "2026-11-21"
 directory = "./dist"
 binding = "ASSETS"
 
-# Cloudflare bindings will be added after we inspect the current account resources.
-# Do not put secrets in this file or in GitHub.
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "AUTH_DB"
+database_name = "webora-auth-db"
+database_id = "be70ea72-9943-47a6-8bfd-f355a27a43df"
+
+# RECAPTCHA_SECRET remains managed as an existing Worker secret in Cloudflare.
