@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu } from "lucide-react";
+import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Video } from "lucide-react";
 
 type Lang = "en" | "ka" | "ru";
 type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings";
@@ -50,6 +50,8 @@ export default function App() {
   const [section, setSection] = useState<Section>("webora");
   const [prompt, setPrompt] = useState("");
   const [url, setUrl] = useState("");
+  const [kvaraView, setKvaraView] = useState<"home" | "image" | "video">("home");
+  const [kvaraMenuOpen, setKvaraMenuOpen] = useState(false);
   const [sidebar, setSidebar] = useState(() => window.innerWidth > 560);
   const t = copy[lang];
 
@@ -87,7 +89,7 @@ export default function App() {
         {section === "projects" && <section className="page"><div className="eyebrow">WORKSPACE</div><h1>{t.projectsTitle}</h1><p className="subtitle">{t.projectsSub}</p><div className="empty-state"><FolderOpen size={30}/><b>{t.noProjects}</b><p>{t.noProjectsSub}</p><button className="primary" onClick={() => navigate("webora")}>{t.start}</button></div></section>}
         {section === "upgrader" && <section className="page"><div className="eyebrow">WEBSITE TOOLS</div><h1>{t.upgradeTitle}</h1><p className="subtitle">{t.upgradeSub}</p><div className="form-card"><label>Website URL</label><input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com"/><button className="primary" onClick={notify} disabled={!url.trim()}>{t.analyze}<ArrowUpRight size={16}/></button><small>Sign-in will be required before analysis is enabled.</small></div></section>}
         {section === "help" && <section className="page"><div className="eyebrow">SUPPORT</div><h1>{t.helpTitle}</h1><p className="subtitle">{t.helpSub}</p><div className="empty-state"><LifeBuoy size={30}/><b>Getting started</b><p>Guides and walkthroughs will be added here.</p></div></section>}
-        {section === "kvara" && <section className="page"><div className="eyebrow">AI ASSISTANT</div><h1>{t.kvaraTitle}</h1><p className="subtitle">{t.kvaraSub}</p><div className="empty-state"><BrainCircuit size={30}/><b>Kvara AI</b><p>The separate Kvara AI integration will be connected here.</p></div></section>}
+        {section === "kvara" && <section className="page"><div className="eyebrow">AI ASSISTANT</div><div className="kvara-title-row"><h1>{t.kvaraTitle}</h1><div className="kvara-switcher"><button className="kvara-switch-button" onClick={() => setKvaraMenuOpen(!kvaraMenuOpen)} aria-expanded={kvaraMenuOpen} aria-label="Open Kvara AI tools menu"><ChevronDown size={18}/></button>{kvaraMenuOpen && <div className="kvara-menu"><button onClick={() => {setKvaraView("home");setKvaraMenuOpen(false);}}><Home size={16}/>Home Page</button><button onClick={() => {setKvaraView("image");setKvaraMenuOpen(false);}}><ImageIcon size={16}/>Image Studio</button><button onClick={() => {setKvaraView("video");setKvaraMenuOpen(false);}}><Video size={16}/>Video Studio</button></div>}</div></div><p className="subtitle">{t.kvaraSub}</p>{kvaraView === "home" && <div className="empty-state"><BrainCircuit size={30}/><b>Kvara AI Home Page</b><p>The Kvara AI home page will be connected here.</p></div>}{kvaraView === "image" && <div className="empty-state"><ImageIcon size={30}/><b>Image Studio</b><p>AI image creation will be connected here.</p></div>}{kvaraView === "video" && <div className="empty-state"><Video size={30}/><b>Video Studio</b><p>AI video creation will be connected here.</p></div>}</section>}
         {section === "settings" && <section className="page"><div className="eyebrow">PREFERENCES</div><h1>{t.settingsTitle}</h1><div className="form-card"><label>{t.language}</label><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)}><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select></div></section>}
       </div>
       <footer><span>© 2026 Kvara Global Group</span><span>{t.tagline}</span></footer>
