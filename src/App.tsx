@@ -50,19 +50,21 @@ export default function App() {
   const [section, setSection] = useState<Section>("webora");
   const [prompt, setPrompt] = useState("");
   const [url, setUrl] = useState("");
-  const [sidebar, setSidebar] = useState(true);
+  const [sidebar, setSidebar] = useState(() => window.innerWidth > 560);
   const t = copy[lang];
 
   function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }
 
   function notify() { window.alert(t.coming); }
 
+  function navigate(next: Section) { setSection(next); if (window.innerWidth <= 560) setSidebar(false); }
+
   return <div className={`shell flag-bg-${lang}`}>
     <aside className={sidebar ? "sidebar" : "sidebar collapsed"}>
       <div className="brand"><div className="brand-mark">K</div><div><b>KVARA</b><span>GLOBAL GROUP</span></div></div>
-      <button className="new-project" onClick={() => setSection("webora")}><Plus size={17}/>{t.start}</button>
+      <button className="new-project" onClick={() => navigate("webora")}><Plus size={17}/>{t.start}</button>
       <div className="nav-label">WORKSPACE</div>
-      <nav>{nav.map(([key, Icon]) => <button key={key} className={section === key ? "nav-item active" : "nav-item"} onClick={() => setSection(key as Section)}><Icon size={18}/><span>{t[key]}</span></button>)}</nav>
+      <nav>{nav.map(([key, Icon]) => <button key={key} className={section === key ? "nav-item active" : "nav-item"} onClick={() => navigate(key as Section)}><Icon size={18}/><span>{t[key]}</span></button>)}</nav>
       <div className="sidebar-bottom"><div className="status-dot"/> All systems in development</div>
     </aside>
     <main className="main">
@@ -82,7 +84,7 @@ export default function App() {
           </div>
           <div className="feature-grid"><article><span className="feature-icon"><FolderOpen/></span><b>{t.projects}</b><p>Keep your generated websites organized.</p></article><article><span className="feature-icon"><WandSparkles/></span><b>{t.upgrader}</b><p>Review and improve an existing website.</p></article><article><span className="feature-icon"><BrainCircuit/></span><b>{t.kvara}</b><p>Your AI assistant in its own space.</p></article></div>
         </section>}
-        {section === "projects" && <section className="page"><div className="eyebrow">WORKSPACE</div><h1>{t.projectsTitle}</h1><p className="subtitle">{t.projectsSub}</p><div className="empty-state"><FolderOpen size={30}/><b>{t.noProjects}</b><p>{t.noProjectsSub}</p><button className="primary" onClick={() => setSection("webora")}>{t.start}</button></div></section>}
+        {section === "projects" && <section className="page"><div className="eyebrow">WORKSPACE</div><h1>{t.projectsTitle}</h1><p className="subtitle">{t.projectsSub}</p><div className="empty-state"><FolderOpen size={30}/><b>{t.noProjects}</b><p>{t.noProjectsSub}</p><button className="primary" onClick={() => navigate("webora")}>{t.start}</button></div></section>}
         {section === "upgrader" && <section className="page"><div className="eyebrow">WEBSITE TOOLS</div><h1>{t.upgradeTitle}</h1><p className="subtitle">{t.upgradeSub}</p><div className="form-card"><label>Website URL</label><input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com"/><button className="primary" onClick={notify} disabled={!url.trim()}>{t.analyze}<ArrowUpRight size={16}/></button><small>Sign-in will be required before analysis is enabled.</small></div></section>}
         {section === "help" && <section className="page"><div className="eyebrow">SUPPORT</div><h1>{t.helpTitle}</h1><p className="subtitle">{t.helpSub}</p><div className="empty-state"><LifeBuoy size={30}/><b>Getting started</b><p>Guides and walkthroughs will be added here.</p></div></section>}
         {section === "kvara" && <section className="page"><div className="eyebrow">AI ASSISTANT</div><h1>{t.kvaraTitle}</h1><p className="subtitle">{t.kvaraSub}</p><div className="empty-state"><BrainCircuit size={30}/><b>Kvara AI</b><p>The separate Kvara AI integration will be connected here.</p></div></section>}
