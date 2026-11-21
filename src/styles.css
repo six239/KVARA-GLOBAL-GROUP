@@ -64,3 +64,26 @@
 .video-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .video-options .studio-label{margin-bottom:0}
 @media(max-width:480px){.video-options{grid-template-columns:1fr}}
+
+
+/* Simple Bank of Georgia-only checkout preview */
+.get-app-button{border:1px solid #a17bda66;border-radius:9px;background:#8b58e51c;color:#eee5ff;padding:8px 11px;font-size:11px;font-weight:700;cursor:pointer}
+.get-app-button:hover{background:#8b58e533}
+.checkout-backdrop{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:18px;background:#05040bd9;backdrop-filter:blur(10px)}
+.checkout-modal{position:relative;width:min(100%,430px);padding:28px;border:1px solid #ffffff20;border-radius:20px;background:linear-gradient(145deg,#1b1628,#0d0b15);box-shadow:0 28px 90px #000b}
+.checkout-close{position:absolute;top:13px;right:15px;border:0;background:transparent;color:#bdb2ce;font-size:27px;cursor:pointer}
+.checkout-brand{font:700 12px 'Space Grotesk';letter-spacing:2px;color:#f5efff}
+.checkout-secure{margin-top:24px;color:#a98add;font-size:9px;font-weight:700;letter-spacing:2px}
+.checkout-modal h2{margin:10px 0 6px;font:600 25px 'Space Grotesk';letter-spacing:-.7px}
+.checkout-description{margin:0;color:#9d93ad;font-size:12px}
+.checkout-total{display:flex;justify-content:space-between;align-items:center;margin:25px 0;padding:17px 0;border-top:1px solid #ffffff16;border-bottom:1px solid #ffffff16;color:#c8bfd6;font-size:13px}
+.checkout-total strong{font:700 27px 'Space Grotesk';color:#fff}
+.checkout-method{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #a17bda66;border-radius:12px;background:#8b58e510}
+.checkout-bank-mark{width:35px;height:35px;display:grid;place-items:center;border-radius:10px;background:#f1f0ed;color:#b31e2d;font:700 21px 'Space Grotesk'}
+.checkout-method b,.checkout-method small{display:block}
+.checkout-method b{font-size:12px;color:#f5efff}
+.checkout-method small{margin-top:4px;color:#a79bb8;font-size:10px}
+.checkout-selected{margin-left:auto;color:#c9adf4;font-size:9px;font-weight:700}
+.checkout-continue{width:100%;margin-top:18px}
+.checkout-disclaimer{margin:13px 0 0;color:#81778e;font-size:10px;line-height:1.6;text-align:center}
+@media(max-width:560px){.get-app-button{padding:7px 8px;font-size:10px}.checkout-modal{padding:24px 20px}}
