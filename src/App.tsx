@@ -53,7 +53,9 @@ export default function App() {
   const [sidebar, setSidebar] = useState(true);
   const t = copy[lang];
 
-  function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }\n\n  function notify() { window.alert(t.coming); }
+  function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }
+
+  function notify() { window.alert(t.coming); }
 
   return <div className={`shell flag-bg-${lang}`}>
     <aside className={sidebar ? "sidebar" : "sidebar collapsed"}>
