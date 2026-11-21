@@ -46,16 +46,16 @@ const nav = [
 ] as const;
 
 export default function App() {
-  const [lang, setLang] = useState<Lang>("en");
+  const [lang, setLang] = useState<Lang>(() => { const saved = localStorage.getItem("kvara-language"); return saved === "ka" || saved === "ru" ? saved : "en"; });
   const [section, setSection] = useState<Section>("webora");
   const [prompt, setPrompt] = useState("");
   const [url, setUrl] = useState("");
   const [sidebar, setSidebar] = useState(true);
   const t = copy[lang];
 
-  function notify() { window.alert(t.coming); }
+  function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }\n\n  function notify() { window.alert(t.coming); }
 
-  return <div className="shell">
+  return <div className={`shell flag-bg-${lang}`}>
     <aside className={sidebar ? "sidebar" : "sidebar collapsed"}>
       <div className="brand"><div className="brand-mark">K</div><div><b>KVARA</b><span>GLOBAL GROUP</span></div></div>
       <button className="new-project" onClick={() => setSection("webora")}><Plus size={17}/>{t.start}</button>
@@ -67,7 +67,7 @@ export default function App() {
       <header className="topbar">
         <button className="icon-button mobile-menu" onClick={() => setSidebar(!sidebar)} aria-label="Toggle menu"><Menu size={20}/></button>
         <div className="crumb">Kvara Global <span>/</span> {t[section]}</div>
-        <div className="top-actions"><Globe2 size={16}/><select value={lang} onChange={e => setLang(e.target.value as Lang)} aria-label="Language"><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select><div className="avatar">K</div></div>
+        <div className="top-actions"><Globe2 size={16}/><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)} aria-label="Language"><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select><div className="avatar">K</div></div>
       </header>
       <div className="content">
         {section === "webora" && <section className="hero">
