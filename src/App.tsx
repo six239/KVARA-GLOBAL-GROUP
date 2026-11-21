@@ -95,6 +95,14 @@ export default function App() {
   function navigate(next: Section) { setSection(next); if (window.innerWidth <= 560) setSidebar(false); }
 
   return <div className={`shell flag-bg-${lang}`}>
+    <svg className="visual-filters" aria-hidden="true" focusable="false">
+      <filter id="flag-wave" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.025" numOctaves="2" seed="4" result="noise">
+          <animate attributeName="baseFrequency" dur="9s" values="0.008 0.025;0.012 0.035;0.008 0.025" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="17" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
     <aside className={sidebar ? "sidebar" : "sidebar collapsed"}>
       <div className="brand"><div className="brand-mark">K</div><div><b>KVARA</b><span>GLOBAL GROUP</span></div></div>
       <button className="new-project" onClick={() => navigate("webora")}><Plus size={17}/>{t.start}</button>
