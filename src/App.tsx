@@ -126,6 +126,7 @@ export default function App() {
   const [authError, setAuthError] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
   useEffect(() => { fetch("/api/auth/me").then(r=>r.json()).then(d=>setAccount(d.user||null)).catch(()=>setAccount(null)); }, []);
+  useEffect(() => { if (!account) return; fetch("/api/projects").then(r=>r.ok?r.json():null).then(d=>{ if(d && Array.isArray(d.projects)){ const merged=[...d.projects,...projects.filter(p=>!d.projects.some((q:{id:string})=>q.id===p.id))].slice(0,100); setProjects(merged); localStorage.setItem("webora-projects",JSON.stringify(merged)); } }).catch(()=>{}); }, [account?.id]);
   const t = copy[lang];
 
   function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }
@@ -163,6 +164,7 @@ export default function App() {
       const updated = [project, ...projects].slice(0, 30);
       setProjects(updated);
       localStorage.setItem("webora-projects", JSON.stringify(updated));
+      if (account) fetch("/api/projects",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(project)}).catch(()=>{});
     } catch (error) {
       setGenerationError(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     } finally {
