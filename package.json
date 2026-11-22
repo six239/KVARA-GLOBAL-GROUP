@@ -14,12 +14,15 @@
     "vite": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "latest"
+    "lucide-react": "latest",
+    "@capacitor/core": "^7.4.3"
   },
   "devDependencies": {
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "typescript": "latest",
-    "wrangler": "latest"
+    "wrangler": "latest",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/android": "^7.4.3"
   }
 }
