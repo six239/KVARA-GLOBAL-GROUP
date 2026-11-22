@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, ChevronLeft, ChevronRight, Image as ImageIcon, Home, Video, Upload, Download, RotateCw, Info } from "lucide-react";
+import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Video, Upload, Download, RotateCw, Info } from "lucide-react";
 
 type Lang = "en" | "ka" | "ru";
 type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings" | "about";
