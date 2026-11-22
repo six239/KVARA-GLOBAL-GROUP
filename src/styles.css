@@ -531,3 +531,14 @@ footer {
   .sidebar-edge-toggle { display: none; }
   .sidebar.collapsed { display: none; }
 }
+
+.account-avatar { border: 0; cursor: pointer; }
+.account-card { max-width: 620px; }
+.account-name-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; color: #f4f6fb; overflow-wrap: anywhere; }
+.role-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; font-size: 10px; font-weight: 700; }
+.owner-badge { color: #f7d58a; border-color: rgba(247,213,138,.38); background: rgba(177,129,35,.12); }
+.verified-badge { color: #dcecff; border-color: rgba(210,230,255,.5); background: rgba(255,255,255,.06); }
+.account-form { gap: 12px; }
+.account-form .studio-tabs { margin: 0 0 5px; }
+.account-form .studio-tab { flex: 1; }
+.account-form .primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
