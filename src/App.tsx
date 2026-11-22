@@ -6,7 +6,7 @@ type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings
 
 const copy = {
   en: {
-    tagline: "One group. A world of ideas.", welcome: "Build something remarkable.", sub: "Your workspace for creating, managing and improving websites.",
+    tagline: "One group. A world of ideas.", appDownload: "Download Android app", welcome: "Build something remarkable.", sub: "Your workspace for creating, managing and improving websites.",
     webora: "Webora AI", projects: "My Projects", upgrader: "Website Upgrader", help: "Help Center", kvara: "Kvara AI", settings: "Settings", about: "About",
     start: "Start building", prompt: "Describe the website you want to create…", generate: "Generate website",
     projectsTitle: "Your projects", projectsSub: "Websites you create will appear here automatically.",
@@ -17,7 +17,7 @@ const copy = {
     noProjects: "No projects yet", noProjectsSub: "Create your first website with Webora AI."
   },
   ka: {
-    tagline: "ერთი ჯგუფი. იდეების მთელი სამყარო.", welcome: "შექმენი რაღაც გამორჩეული.", sub: "სამუშაო სივრცე ვებსაიტების შესაქმნელად, სამართავად და გასაუმჯობესებლად.",
+    tagline: "ერთი ჯგუფი. იდეების მთელი სამყარო.", appDownload: "Android აპის ჩამოტვირთვა", welcome: "შექმენი რაღაც გამორჩეული.", sub: "სამუშაო სივრცე ვებსაიტების შესაქმნელად, სამართავად და გასაუმჯობესებლად.",
     webora: "Webora AI", projects: "ჩემი პროექტები", upgrader: "ვებსაიტის გაუმჯობესება", help: "დახმარების ცენტრი", kvara: "Kvara AI", settings: "პარამეტრები", about: "შესახებ",
     start: "შექმნის დაწყება", prompt: "აღწერე, როგორი ვებსაიტის შექმნა გინდა…", generate: "ვებსაიტის შექმნა",
     projectsTitle: "შენი პროექტები", projectsSub: "შენ მიერ შექმნილი ვებსაიტები აქ ავტომატურად გამოჩნდება.",
@@ -28,7 +28,7 @@ const copy = {
     noProjects: "პროექტები ჯერ არ არის", noProjectsSub: "შექმენი პირველი ვებსაიტი Webora AI-ით."
   },
   ru: {
-    tagline: "Одна группа. Мир идей.", welcome: "Создайте нечто выдающееся.", sub: "Рабочее пространство для создания, управления и улучшения сайтов.",
+    tagline: "Одна группа. Мир идей.", appDownload: "Скачать приложение Android", welcome: "Создайте нечто выдающееся.", sub: "Рабочее пространство для создания, управления и улучшения сайтов.",
     webora: "Webora AI", projects: "Мои проекты", upgrader: "Улучшение сайта", help: "Центр помощи", kvara: "Kvara AI", settings: "Настройки", about: "О приложении",
     start: "Начать создание", prompt: "Опишите сайт, который хотите создать…", generate: "Создать сайт",
     projectsTitle: "Ваши проекты", projectsSub: "Созданные вами сайты будут автоматически появляться здесь.",
@@ -197,7 +197,7 @@ export default function App() {
       <div className="content">
         {section === "webora" && <section className="hero">
           <div className="eyebrow"><Sparkles size={14}/> AI WEBSITE STUDIO</div>
-          <h1>{t.welcome}</h1><p className="subtitle">{t.sub}</p>
+          <h1>{t.welcome}</h1><p className="subtitle">{t.sub}</p><a className="primary app-download-cta" href="https://github.com/six239/KVARA-GLOBAL-GROUP/releases/latest/download/Kvara-Global-Group.apk"><Download size={17}/>{t.appDownload}</a>
           <div className="builder-card">
             <div className="builder-head"><div className="orb"><WandSparkles size={20}/></div><div><b>{t.webora}</b><small>Turn your idea into a website</small></div><span className="pill">STUDIO</span></div>
             <textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder={t.prompt}/>
