@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Video, Upload, Download, RotateCw, Info } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Video, Upload, Download, RotateCw, Info, UserRound, BadgeCheck, ShieldCheck, LogOut } from "lucide-react";
 
 type Lang = "en" | "ka" | "ru";
-type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings" | "about";
+type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings" | "about" | "account";
 
 const copy = {
   en: {
     tagline: "One group. A world of ideas.", appDownload: "Download Android app", welcome: "Build something remarkable.", sub: "Your workspace for creating, managing and improving websites.",
-    webora: "Webora AI", projects: "My Projects", upgrader: "Website Upgrader", help: "Help Center", kvara: "Kvara AI", settings: "Settings", about: "About",
+    webora: "Webora AI", projects: "My Projects", upgrader: "Website Upgrader", help: "Help Center", kvara: "Kvara AI", settings: "Settings", about: "About", account: "Account",
     start: "Start building", prompt: "Describe the website you want to create…", generate: "Generate website",
     projectsTitle: "Your projects", projectsSub: "Websites you create will appear here automatically.",
     upgradeTitle: "Make your existing website better", upgradeSub: "Enter a public website URL to begin an upgrade analysis.",
@@ -18,7 +18,7 @@ const copy = {
   },
   ka: {
     tagline: "ერთი ჯგუფი. იდეების მთელი სამყარო.", appDownload: "Android აპის ჩამოტვირთვა", welcome: "შექმენი რაღაც გამორჩეული.", sub: "სამუშაო სივრცე ვებსაიტების შესაქმნელად, სამართავად და გასაუმჯობესებლად.",
-    webora: "Webora AI", projects: "ჩემი პროექტები", upgrader: "ვებსაიტის გაუმჯობესება", help: "დახმარების ცენტრი", kvara: "Kvara AI", settings: "პარამეტრები", about: "შესახებ",
+    webora: "Webora AI", projects: "ჩემი პროექტები", upgrader: "ვებსაიტის გაუმჯობესება", help: "დახმარების ცენტრი", kvara: "Kvara AI", settings: "პარამეტრები", about: "შესახებ", account: "ანგარიში",
     start: "შექმნის დაწყება", prompt: "აღწერე, როგორი ვებსაიტის შექმნა გინდა…", generate: "ვებსაიტის შექმნა",
     projectsTitle: "შენი პროექტები", projectsSub: "შენ მიერ შექმნილი ვებსაიტები აქ ავტომატურად გამოჩნდება.",
     upgradeTitle: "გააუმჯობესე არსებული ვებსაიტი", upgradeSub: "ანალიზის დასაწყებად შეიყვანე საჯარო ვებსაიტის ბმული.",
@@ -29,7 +29,7 @@ const copy = {
   },
   ru: {
     tagline: "Одна группа. Мир идей.", appDownload: "Скачать приложение Android", welcome: "Создайте нечто выдающееся.", sub: "Рабочее пространство для создания, управления и улучшения сайтов.",
-    webora: "Webora AI", projects: "Мои проекты", upgrader: "Улучшение сайта", help: "Центр помощи", kvara: "Kvara AI", settings: "Настройки", about: "О приложении",
+    webora: "Webora AI", projects: "Мои проекты", upgrader: "Улучшение сайта", help: "Центр помощи", kvara: "Kvara AI", settings: "Настройки", about: "О приложении", account: "Аккаунт",
     start: "Начать создание", prompt: "Опишите сайт, который хотите создать…", generate: "Создать сайт",
     projectsTitle: "Ваши проекты", projectsSub: "Созданные вами сайты будут автоматически появляться здесь.",
     upgradeTitle: "Улучшите существующий сайт", upgradeSub: "Введите общедоступный URL сайта, чтобы начать анализ.",
@@ -42,7 +42,7 @@ const copy = {
 
 const nav = [
   ["webora", Sparkles], ["projects", FolderOpen], ["upgrader", WandSparkles],
-  ["help", LifeBuoy], ["kvara", BrainCircuit], ["settings", Settings], ["about", Info]
+  ["help", LifeBuoy], ["kvara", BrainCircuit], ["settings", Settings], ["about", Info], ["account", UserRound]
 ] as const;
 
 const helpGuides = {
@@ -119,9 +119,28 @@ export default function App() {
     img.src = editImage;
   }
   const [sidebar, setSidebar] = useState(() => window.innerWidth > 560);
+  const [account, setAccount] = useState<{id:string;email:string;verified:boolean;owner:boolean}|null>(null);
+  const [authMode, setAuthMode] = useState<"login"|"register">("login");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
+  useEffect(() => { fetch("/api/auth/me").then(r=>r.json()).then(d=>setAccount(d.user||null)).catch(()=>setAccount(null)); }, []);
   const t = copy[lang];
 
   function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }
+
+  async function submitAuth() {
+    setAuthBusy(true); setAuthError("");
+    try {
+      const response = await fetch(`/api/auth/${authMode}`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({email:authEmail,password:authPassword}) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Account request failed.");
+      setAccount(data.user); setAuthPassword("");
+    } catch (error) { setAuthError(error instanceof Error ? error.message : "Please try again."); }
+    finally { setAuthBusy(false); }
+  }
+  async function logout() { await fetch("/api/auth/logout",{method:"POST"}); setAccount(null); }
 
   async function generateWebsite() {
     if (!prompt.trim() || isGenerating) return;
@@ -193,7 +212,7 @@ export default function App() {
       <header className="topbar">
         <button className="icon-button mobile-menu" onClick={() => setSidebar(!sidebar)} aria-label="Toggle menu"><Menu size={20}/></button>
         <div className="crumb">Kvara Global <span>/</span> {t[section]}</div>
-        <div className="top-actions"><span className="free-access-label">FREE FOR EVERYONE</span><Globe2 size={16}/><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)} aria-label="Language"><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select><div className="avatar">K</div></div>
+        <div className="top-actions"><span className="free-access-label">FREE FOR EVERYONE</span><Globe2 size={16}/><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)} aria-label="Language"><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select><button className="avatar account-avatar" onClick={() => navigate("account")} aria-label="Open account">{account ? account.email.slice(0,1).toUpperCase() : <UserRound size={17}/>}</button></div>
       </header>
       <div className="content">
         {section === "webora" && <section className="hero">
@@ -244,6 +263,7 @@ export default function App() {
           </div>
         )}</section>}
         {section === "settings" && <section className="page"><div className="eyebrow">PREFERENCES</div><h1>{t.settingsTitle}</h1><div className="form-card"><label>{t.language}</label><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)}><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select></div></section>}
+        {section === "account" && <section className="page"><div className="eyebrow">KGG · ACCOUNT</div><h1>{account ? "Your account" : "Sign in or create an account"}</h1><p className="subtitle">Manage your Kvara Global Group identity.</p>{account ? <div className="about-card account-card"><div className="account-name-row"><b>{account.email}</b>{account.owner && <span className="role-badge owner-badge"><ShieldCheck size={14}/>Owner</span>}{account.verified && <span className="role-badge verified-badge"><BadgeCheck size={14}/>Verified</span>}</div><p>{account.verified ? "Your contact method is verified." : "Email / phone verification is not yet available. Your account is not marked verified."}</p><button className="secondary" onClick={logout}><LogOut size={16}/>Sign out</button></div> : <div className="form-card account-form"><div className="studio-tabs"><button className={authMode==="login"?"studio-tab active":"studio-tab"} onClick={()=>{setAuthMode("login");setAuthError("");}}>Sign in</button><button className={authMode==="register"?"studio-tab active":"studio-tab"} onClick={()=>{setAuthMode("register");setAuthError("");}}>Create account</button></div><label>Email address</label><input type="email" autoComplete="email" value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="you@example.com"/><label>Password (10–128 characters)</label><input type="password" autoComplete={authMode==="login"?"current-password":"new-password"} value={authPassword} onChange={e=>setAuthPassword(e.target.value)} placeholder="Enter your password"/>{authError && <div className="generation-error" role="alert">{authError}</div>}<button className="primary" onClick={submitAuth} disabled={authBusy||!authEmail.trim()||authPassword.length<10}>{authBusy?"Please wait…":authMode==="login"?"Sign in":"Create account"}</button><small>Accounts use secure server-side sessions. Email verification and cloud project sync are not enabled yet.</small></div>}</section>}
         {section === "about" && <section className="page"><div className="eyebrow">KGG · KVARA GLOBAL GROUP</div><h1>About Kvara Global Group</h1><p className="subtitle">One group. A world of ideas. A workspace for building, managing and improving websites.</p><div className="about-card"><div className="about-mark">KGG</div><h2>Kvara Global Group</h2><p>Version 1.0.0</p><p>Developed by Kvara Global Group.</p><a className="primary about-download" href="https://github.com/six239/KVARA-GLOBAL-GROUP/releases/latest/download/Kvara-Global-Group.apk"><Download size={17}/> Download Android APK</a><small>The Android app requires an internet connection to use the online platform. This is an installable test build.</small><p className="about-copyright">© 2026 Kvara Global Group. All rights reserved.</p></div></section>}
       </div>
       <footer><span>© 2026 Kvara Global Group</span><span>{t.tagline}</span></footer>
