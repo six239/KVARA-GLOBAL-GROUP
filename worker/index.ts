@@ -83,6 +83,13 @@ export default {
       const password = typeof body.password === "string" ? body.password : "";
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return json({ error: "Enter a valid email address." }, 400);
       if (password.length < 10 || password.length > 128) return json({ error: "Password must be 10–128 characters." }, 400);
+      const clientIp = request.headers.get("CF-Connecting-IP") || "unknown";
+      const rateKey = await digest(clientIp + "|" + email);
+      const now = new Date().toISOString();
+      const windowStart = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+      await env.AUTH_DB.prepare("INSERT INTO auth_rate_limits (rate_key,attempts,window_start) VALUES (?,1,?) ON CONFLICT(rate_key) DO UPDATE SET attempts=CASE WHEN window_start < ? THEN 1 ELSE attempts+1 END, window_start=CASE WHEN window_start < ? THEN excluded.window_start ELSE window_start END").bind(rateKey,now,windowStart,windowStart).run();
+      const rate = await env.AUTH_DB.prepare("SELECT attempts FROM auth_rate_limits WHERE rate_key=?").bind(rateKey).first<{attempts:number}>();
+      if ((rate?.attempts || 0) > 8) return json({error:"Too many account attempts. Please wait 15 minutes and try again."},429);
       if (url.pathname.endsWith("/register")) {
         const existing = await env.AUTH_DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
         if (existing) return json({ error: "An account with this email already exists." }, 409);
