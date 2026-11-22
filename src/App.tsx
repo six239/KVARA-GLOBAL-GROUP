@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Video, Upload, Download, RotateCw, Info } from "lucide-react";
+import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, ChevronLeft, ChevronRight, Image as ImageIcon, Home, Video, Upload, Download, RotateCw, Info } from "lucide-react";
 
 type Lang = "en" | "ka" | "ru";
 type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings" | "about";
@@ -182,10 +182,11 @@ export default function App() {
       </filter>
     </svg>
     <aside className={sidebar ? "sidebar" : "sidebar collapsed"}>
+      <button className="sidebar-edge-toggle" onClick={() => setSidebar(!sidebar)} aria-label={sidebar ? "Collapse sidebar" : "Expand sidebar"} title={sidebar ? "Collapse sidebar" : "Expand sidebar"}><span>{sidebar ? "‹" : "›"}</span></button>
       <div className="brand"><div className="brand-mark">K</div><div><b>KVARA</b><span>GLOBAL GROUP</span></div></div>
-      <button className="new-project" onClick={() => navigate("webora")}><Plus size={17}/>{t.start}</button>
+      <button className="new-project" title={t.start} onClick={() => navigate("webora")}><Plus size={17}/>{t.start}</button>
       <div className="nav-label">WORKSPACE</div>
-      <nav>{nav.map(([key, Icon]) => <button key={key} className={section === key ? "nav-item active" : "nav-item"} onClick={() => navigate(key as Section)}><Icon size={18}/><span>{t[key]}</span></button>)}</nav>
+      <nav>{nav.map(([key, Icon]) => <button key={key} title={t[key]} className={section === key ? "nav-item active" : "nav-item"} onClick={() => navigate(key as Section)}><Icon size={18}/><span>{t[key]}</span></button>)}</nav>
       <div className="sidebar-bottom"><div className="status-dot"/> All systems in development</div>
     </aside>
     <main className="main">
