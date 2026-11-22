@@ -500,3 +500,7 @@ footer {
 .about-download { display: inline-flex; align-items: center; gap: 9px; margin: 14px 0; text-decoration: none; }
 .about-card small { display: block; max-width: 440px; color: #9eabc0; font-size: 11px; line-height: 1.6; }
 .about-card .about-copyright { margin-top: 25px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); font-size: 11px; }
+
+
+.app-download-cta { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 22px; text-decoration: none; }
+.app-download-cta:hover { filter: brightness(1.08); }
