@@ -5,6 +5,7 @@ interface AiBinding {
 interface D1Statement {
   bind(...values: unknown[]): D1Statement;
   first<T = Record<string, unknown>>(): Promise<T | null>;
+  all<T = Record<string, unknown>>(): Promise<{ results: T[] }>;
   run(): Promise<{ success: boolean; meta?: { changes?: number } }>;
 }
 interface D1Database { prepare(sql: string): D1Statement; }
@@ -50,6 +51,29 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+
+
+    if (url.pathname === "/api/projects") {
+      const token = readCookie(request,"kgg_session");
+      if (!token) return json({error:"Sign in to use cloud projects."},401);
+      const user = await env.AUTH_DB.prepare("SELECT u.id FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.id_hash=? AND s.revoked_at IS NULL AND s.expires_at>? AND u.disabled_at IS NULL").bind(await digest(token),new Date().toISOString()).first<{id:string}>();
+      if (!user) return json({error:"Your session has expired. Please sign in again."},401);
+      if (request.method === "GET") {
+        const rows = await env.AUTH_DB.prepare("SELECT id,title,html,created_at AS createdAt FROM user_projects WHERE user_id=? ORDER BY updated_at DESC LIMIT 100").bind(user.id).all<{id:string,title:string,html:string,createdAt:string}>();
+        return json({projects:rows.results || []});
+      }
+      if (request.method === "POST") {
+        let body: {id?:unknown;title?:unknown;html?:unknown};
+        try { body=await request.json() as typeof body; } catch { return json({error:"Invalid JSON."},400); }
+        const id=typeof body.id==="string"?body.id.slice(0,80):"";
+        const title=typeof body.title==="string"?body.title.trim().slice(0,120):"";
+        const html=typeof body.html==="string"?body.html:"";
+        if (!id || !title || !html || html.length>120000) return json({error:"Project data is invalid or too large."},400);
+        await env.AUTH_DB.prepare("INSERT INTO user_projects (id,user_id,title,html) VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,html=excluded.html,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE user_projects.user_id=excluded.user_id").bind(id,user.id,title,html).run();
+        return json({ok:true});
+      }
+      return json({error:"Method not allowed."},405);
+    }
 
     if (url.pathname === "/api/auth/register" || url.pathname === "/api/auth/login") {
       if (request.method !== "POST") return json({ error: "Use POST." }, 405);
