@@ -504,3 +504,30 @@ footer {
 
 .app-download-cta { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 22px; text-decoration: none; }
 .app-download-cta:hover { filter: brightness(1.08); }
+
+
+/* Accessible desktop sidebar collapse control */
+.sidebar { overflow: visible; }
+.sidebar.collapsed { width: 78px; padding-left: 12px; padding-right: 12px; }
+.sidebar-edge-toggle {
+  position: absolute; z-index: 5; top: 74px; right: -14px;
+  width: 28px; height: 42px; display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,.2); border-radius: 0 10px 10px 0;
+  color: #f4f6fb; background: #101827; cursor: pointer;
+  box-shadow: 8px 5px 18px rgba(0,0,0,.25);
+}
+.sidebar-edge-toggle span { font: 500 25px/1 Arial,sans-serif; margin-top: -3px; }
+.sidebar-edge-toggle:hover { background: #1b2940; }
+.sidebar.collapsed .brand { justify-content: center; padding-left: 0; padding-right: 0; }
+.sidebar.collapsed .brand > div:last-child,
+.sidebar.collapsed .new-project,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .sidebar-bottom { display: none; }
+.sidebar.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+.sidebar.collapsed .nav-item svg { flex: 0 0 auto; }
+.sidebar.collapsed .brand-mark { flex: 0 0 42px; }
+@media (max-width: 560px) {
+  .sidebar-edge-toggle { display: none; }
+  .sidebar.collapsed { display: none; }
+}
