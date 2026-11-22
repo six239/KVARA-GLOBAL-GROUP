@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Video, Upload, Download, RotateCw } from "lucide-react";
+import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Video, Upload, Download, RotateCw, Info } from "lucide-react";
 
 type Lang = "en" | "ka" | "ru";
-type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings";
+type Section = "webora" | "projects" | "upgrader" | "help" | "kvara" | "settings" | "about";
 
 const copy = {
   en: {
     tagline: "One group. A world of ideas.", welcome: "Build something remarkable.", sub: "Your workspace for creating, managing and improving websites.",
-    webora: "Webora AI", projects: "My Projects", upgrader: "Website Upgrader", help: "Help Center", kvara: "Kvara AI", settings: "Settings",
+    webora: "Webora AI", projects: "My Projects", upgrader: "Website Upgrader", help: "Help Center", kvara: "Kvara AI", settings: "Settings", about: "About",
     start: "Start building", prompt: "Describe the website you want to create…", generate: "Generate website",
     projectsTitle: "Your projects", projectsSub: "Websites you create will appear here automatically.",
     upgradeTitle: "Make your existing website better", upgradeSub: "Enter a public website URL to begin an upgrade analysis.",
@@ -18,7 +18,7 @@ const copy = {
   },
   ka: {
     tagline: "ერთი ჯგუფი. იდეების მთელი სამყარო.", welcome: "შექმენი რაღაც გამორჩეული.", sub: "სამუშაო სივრცე ვებსაიტების შესაქმნელად, სამართავად და გასაუმჯობესებლად.",
-    webora: "Webora AI", projects: "ჩემი პროექტები", upgrader: "ვებსაიტის გაუმჯობესება", help: "დახმარების ცენტრი", kvara: "Kvara AI", settings: "პარამეტრები",
+    webora: "Webora AI", projects: "ჩემი პროექტები", upgrader: "ვებსაიტის გაუმჯობესება", help: "დახმარების ცენტრი", kvara: "Kvara AI", settings: "პარამეტრები", about: "შესახებ",
     start: "შექმნის დაწყება", prompt: "აღწერე, როგორი ვებსაიტის შექმნა გინდა…", generate: "ვებსაიტის შექმნა",
     projectsTitle: "შენი პროექტები", projectsSub: "შენ მიერ შექმნილი ვებსაიტები აქ ავტომატურად გამოჩნდება.",
     upgradeTitle: "გააუმჯობესე არსებული ვებსაიტი", upgradeSub: "ანალიზის დასაწყებად შეიყვანე საჯარო ვებსაიტის ბმული.",
@@ -29,7 +29,7 @@ const copy = {
   },
   ru: {
     tagline: "Одна группа. Мир идей.", welcome: "Создайте нечто выдающееся.", sub: "Рабочее пространство для создания, управления и улучшения сайтов.",
-    webora: "Webora AI", projects: "Мои проекты", upgrader: "Улучшение сайта", help: "Центр помощи", kvara: "Kvara AI", settings: "Настройки",
+    webora: "Webora AI", projects: "Мои проекты", upgrader: "Улучшение сайта", help: "Центр помощи", kvara: "Kvara AI", settings: "Настройки", about: "О приложении",
     start: "Начать создание", prompt: "Опишите сайт, который хотите создать…", generate: "Создать сайт",
     projectsTitle: "Ваши проекты", projectsSub: "Созданные вами сайты будут автоматически появляться здесь.",
     upgradeTitle: "Улучшите существующий сайт", upgradeSub: "Введите общедоступный URL сайта, чтобы начать анализ.",
@@ -42,7 +42,7 @@ const copy = {
 
 const nav = [
   ["webora", Sparkles], ["projects", FolderOpen], ["upgrader", WandSparkles],
-  ["help", LifeBuoy], ["kvara", BrainCircuit], ["settings", Settings]
+  ["help", LifeBuoy], ["kvara", BrainCircuit], ["settings", Settings], ["about", Info]
 ] as const;
 
 const helpGuides = {
@@ -243,6 +243,7 @@ export default function App() {
           </div>
         )}</section>}
         {section === "settings" && <section className="page"><div className="eyebrow">PREFERENCES</div><h1>{t.settingsTitle}</h1><div className="form-card"><label>{t.language}</label><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)}><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select></div></section>}
+        {section === "about" && <section className="page"><div className="eyebrow">KGG · KVARA GLOBAL GROUP</div><h1>About Kvara Global Group</h1><p className="subtitle">One group. A world of ideas. A workspace for building, managing and improving websites.</p><div className="about-card"><div className="about-mark">KGG</div><h2>Kvara Global Group</h2><p>Version 1.0.0</p><p>Developed by Kvara Global Group.</p><a className="primary about-download" href="https://github.com/six239/KVARA-GLOBAL-GROUP/releases/latest/download/Kvara-Global-Group.apk"><Download size={17}/> Download Android APK</a><small>The Android app requires an internet connection to use the online platform. This is an installable test build.</small><p className="about-copyright">© 2026 Kvara Global Group. All rights reserved.</p></div></section>}
       </div>
       <footer><span>© 2026 Kvara Global Group</span><span>{t.tagline}</span></footer>
     </main>
