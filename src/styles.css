@@ -858,3 +858,20 @@ textarea:focus-visible, a:focus-visible {
   .builder-card { margin-top: 28px !important; padding: 18px !important; text-align: left; }
   .builder-card .builder-head { text-align: left; }
 }
+
+
+/* KGG dedicated workspace tools */
+.kgg-tool-page .business-inline-form{display:flex;gap:10px;align-items:center}
+.kgg-tool-page .business-inline-form input{flex:1;min-width:0}
+.kgg-tool-page .workflow-check{display:flex;align-items:center;gap:12px;flex:1;cursor:pointer}
+.kgg-tool-page .workflow-check input{width:18px;height:18px;accent-color:var(--accent)}
+.kgg-tool-page .workflow-check input:checked+span{text-decoration:line-through;opacity:.58}
+.kgg-tool-page .upload-image input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.kgg-tool-page .form-card>label{display:block;margin:14px 0 7px;color:#dce2ef;font-size:13px;font-weight:600}
+.kgg-tool-page .form-card>input,.kgg-tool-page .form-card>textarea,.kgg-tool-page .form-card>label input,.kgg-tool-page .form-card>label textarea,.kgg-tool-page .form-card>label select{width:100%;margin-top:7px}
+.kgg-tool-page .business-record>div{min-width:0;flex:1}
+.kgg-tool-page .business-record span,.kgg-tool-page .business-record small{overflow-wrap:anywhere}
+.kgg-tool-page .business-record p{color:var(--muted);white-space:pre-wrap}
+.kgg-tool-page .business-note{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.kgg-tool-page code{font-size:12px;color:#ffd5d8;background:#ffffff10;padding:3px 6px;border-radius:5px}
+@media(max-width:600px){.kgg-tool-page .business-inline-form{align-items:stretch;flex-direction:column}.kgg-tool-page .business-inline-form .primary{width:100%;justify-content:center}.kgg-tool-page .business-record{align-items:flex-start;flex-wrap:wrap}.kgg-tool-page .business-record>div{flex-basis:100%}}
