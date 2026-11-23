@@ -771,3 +771,90 @@ textarea:focus-visible, a:focus-visible {
  .business-record > div { flex-basis:100%; }
  .business-section-head { align-items:flex-start; }
 }
+
+
+/* KGG country-specific flag interface — restored to match the supplied mobile references */
+.shell::before {
+  display: block !important;
+  opacity: .62 !important;
+  filter: url(#flag-wave) saturate(1.16) contrast(1.08) !important;
+  transform: scale(1.08);
+  animation: flag-sway 16s ease-in-out infinite alternate !important;
+}
+.shell::after {
+  background:
+    linear-gradient(90deg, rgba(3,6,13,.72), rgba(3,6,13,.34) 55%, rgba(3,6,13,.24)),
+    linear-gradient(180deg, rgba(3,6,13,.30), rgba(3,6,13,.14) 48%, rgba(3,6,13,.55)) !important;
+}
+.shell.flag-bg-ka {
+  --accent: #f3293d;
+  --accent-2: #fff0f2;
+  --glow: rgba(255,35,55,.34);
+}
+.shell.flag-bg-en {
+  --accent: #1685ff;
+  --accent-2: #ff4356;
+  --glow: rgba(25,111,255,.34);
+}
+.shell.flag-bg-ru {
+  --accent: #1685ff;
+  --accent-2: #ff4356;
+  --glow: rgba(25,111,255,.34);
+}
+.shell.flag-bg-ka::before { background-image: url("https://flagcdn.com/w1600/ge.png") !important; }
+.shell.flag-bg-en::before { background-image: url("https://flagcdn.com/w1600/us.png") !important; }
+.shell.flag-bg-ru::before { background-image: url("https://flagcdn.com/w1600/ru.png") !important; }
+
+.topbar {
+  background: rgba(5,8,17,.52) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+.builder-card, .form-card {
+  border: 1px solid color-mix(in srgb, var(--accent) 78%, white 12%) !important;
+  border-radius: 24px !important;
+  background: rgba(7,10,19,.70) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-2) 28%, transparent),
+    0 0 24px var(--glow), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  backdrop-filter: blur(13px) !important;
+  -webkit-backdrop-filter: blur(13px) !important;
+}
+.builder-card textarea, .form-card input, .form-card textarea,
+.form-card select, .studio-prompt, .studio-select {
+  border: 1px solid rgba(205,220,245,.30) !important;
+  border-radius: 17px !important;
+  background: rgba(3,6,14,.78) !important;
+  color: #f5f7fc !important;
+}
+.builder-card textarea:focus, .form-card input:focus, .form-card textarea:focus {
+  border-color: var(--accent-2) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+.primary, .new-project {
+  border-color: color-mix(in srgb, var(--accent) 70%, white 12%) !important;
+  background: var(--accent) !important;
+  box-shadow: 0 0 20px var(--glow) !important;
+}
+.eyebrow { color: #fff !important; text-shadow: 0 1px 12px rgba(0,0,0,.65); }
+.hero h1, .page h1 { text-shadow: 0 3px 22px rgba(0,0,0,.72) !important; }
+.subtitle { color: rgba(247,249,255,.88) !important; text-shadow: 0 2px 12px rgba(0,0,0,.72); }
+
+@media (max-width: 560px) {
+  .shell::before {
+    position: fixed;
+    inset: 0;
+    opacity: .72 !important;
+    background-position: center center !important;
+    background-size: cover !important;
+  }
+  .shell::after {
+    background: linear-gradient(180deg, rgba(4,6,13,.24), rgba(4,6,13,.40) 48%, rgba(4,6,13,.62)) !important;
+  }
+  .content { padding: 54px 16px 38px !important; }
+  .hero { text-align: left !important; }
+  .hero .eyebrow { justify-content: flex-start; letter-spacing: 2px; }
+  .hero h1 { max-width: 680px; font-size: clamp(38px, 10vw, 54px) !important; line-height: 1.08 !important; letter-spacing: -1.7px !important; }
+  .hero .subtitle { max-width: 680px; font-size: 15px !important; line-height: 1.8 !important; }
+  .builder-card { margin-top: 28px !important; padding: 18px !important; text-align: left; }
+  .builder-card .builder-head { text-align: left; }
+}
