@@ -542,11 +542,6 @@ body {
     radial-gradient(ellipse at 80% 0%, rgba(57,120,200,.09), transparent 42%),
     linear-gradient(120deg, rgba(7,13,23,.2), rgba(7,13,23,.05));
 }
-.shell.flag-bg-ka, .shell.flag-bg-en, .shell.flag-bg-ru {
-  --accent: #3978c8;
-  --accent-2: #8bb7ec;
-  --glow: transparent;
-}
 .sidebar {
   background: rgba(10, 18, 31, .97);
   border-right-color: rgba(164,183,208,.13);
@@ -740,37 +735,6 @@ textarea:focus-visible, a:focus-visible {
 }
 
 
-/* KGG country-specific flag interface — restored to match the supplied mobile references */
-.shell::before {
-  display: block !important;
-  opacity: .62 !important;
-  filter: url(#flag-wave) saturate(1.16) contrast(1.08) !important;
-  transform: scale(1.08);
-  animation: flag-sway 16s ease-in-out infinite alternate !important;
-}
-.shell::after {
-  background:
-    linear-gradient(90deg, rgba(3,6,13,.72), rgba(3,6,13,.34) 55%, rgba(3,6,13,.24)),
-    linear-gradient(180deg, rgba(3,6,13,.30), rgba(3,6,13,.14) 48%, rgba(3,6,13,.55)) !important;
-}
-.shell.flag-bg-ka {
-  --accent: #f3293d;
-  --accent-2: #fff0f2;
-  --glow: rgba(255,35,55,.34);
-}
-.shell.flag-bg-en {
-  --accent: #1685ff;
-  --accent-2: #ff4356;
-  --glow: rgba(25,111,255,.34);
-}
-.shell.flag-bg-ru {
-  --accent: #1685ff;
-  --accent-2: #ff4356;
-  --glow: rgba(25,111,255,.34);
-}
-.shell.flag-bg-ka::before { background-image: url("https://flagcdn.com/w1600/ge.png") !important; }
-.shell.flag-bg-en::before { background-image: url("https://flagcdn.com/w1600/us.png") !important; }
-.shell.flag-bg-ru::before { background-image: url("https://flagcdn.com/w1600/ru.png") !important; }
 
 .topbar {
   background: rgba(5,8,17,.52) !important;
@@ -807,13 +771,6 @@ textarea:focus-visible, a:focus-visible {
 .subtitle { color: rgba(247,249,255,.88) !important; text-shadow: 0 2px 12px rgba(0,0,0,.72); }
 
 @media (max-width: 560px) {
-  .shell::before {
-    position: fixed;
-    inset: 0;
-    opacity: .72 !important;
-    background-position: center center !important;
-    background-size: cover !important;
-  }
   .shell::after {
     background: linear-gradient(180deg, rgba(4,6,13,.24), rgba(4,6,13,.40) 48%, rgba(4,6,13,.62)) !important;
   }
