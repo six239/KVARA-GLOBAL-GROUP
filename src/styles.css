@@ -804,3 +804,42 @@ textarea:focus-visible, a:focus-visible {
 /* Mamuka Support workspace */
 .support-assistant-card,.support-chat-panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;margin:18px 0;box-shadow:0 14px 40px rgba(0,0,0,.14)}
 .support-profile{display:flex;align-items:center;gap:15px}.support-profile h2{margin:4px 0;font-size:24px}.support-profile p{margin:0;color:var(--muted);font-size:13px}.support-avatar{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#6d55c9,#a58af4);font-size:26px;font-weight:800;color:white}.support-call-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}.support-call-actions .studio-note{max-width:390px}.support-chat-panel h3{margin:0 0 14px}.support-chat-history{display:flex;flex-direction:column;gap:12px;max-height:380px;overflow:auto;padding:12px;background:rgba(0,0,0,.12);border:1px solid var(--line);border-radius:14px}.support-message{max-width:86%;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);align-self:flex-start}.support-message.user{align-self:flex-end;background:rgba(125,96,220,.2)}.support-message b{font-size:12px;color:var(--accent-2)}.support-message p{margin:5px 0 0;white-space:pre-wrap;line-height:1.5}.support-chat-form{display:flex;gap:8px;margin-top:12px}.support-chat-form input{flex:1;min-width:0}.support-chat-form button{white-space:nowrap}.support-ticket-toggle{margin-top:12px}.support-mic-button{white-space:nowrap}@media(max-width:560px){.support-assistant-card,.support-chat-panel{padding:15px}.support-chat-form{flex-wrap:wrap}.support-chat-form input{flex-basis:100%}.support-chat-form button{flex:1}.support-call-actions{align-items:flex-start;flex-direction:column}}
+
+
+/* Sidebar navigation scrolling and fixed-height layout */
+.sidebar {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+.sidebar nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139,183,236,.42) transparent;
+  padding: 2px 3px 12px 0;
+}
+.sidebar nav::-webkit-scrollbar { width: 6px; }
+.sidebar nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar nav::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(139,183,236,.38);
+}
+.sidebar nav::-webkit-scrollbar-thumb:hover { background: rgba(139,183,236,.65); }
+.sidebar .brand,
+.sidebar .new-project,
+.sidebar .nav-label,
+.sidebar .sidebar-bottom { flex-shrink: 0; }
+@media (max-width: 560px) {
+  .sidebar:not(.collapsed) {
+    position: fixed;
+    inset: 0 auto 0 0;
+    height: 100dvh;
+    width: min(290px, 86vw);
+    overflow: hidden;
+  }
+  .sidebar:not(.collapsed) nav { min-height: 0; }
+}
