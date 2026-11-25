@@ -222,7 +222,7 @@ export default function App() {
 
   return <div className="shell">
     <aside className={sidebar ? "sidebar" : "sidebar collapsed"}>
-      <button className="sidebar-edge-toggle" onClick={() => setSidebar(!sidebar)} aria-label={sidebar ? "Collapse sidebar" : "Expand sidebar"} title={sidebar ? "Collapse sidebar" : "Expand sidebar"}><span>{sidebar ? "‹" : "›"}</span></button>
+      <button className="sidebar-edge-toggle" onClick={() => setSidebar(!sidebar)} aria-label={sidebar ? "Collapse sidebar" : "Expand sidebar"} title={sidebar ? "Collapse sidebar" : "Expand sidebar"}><span>{sidebar ? "<" : ">"}</span></button>
       <div className="brand"><div className="brand-mark">K</div><div><b>KVARA</b><span>GLOBAL GROUP</span></div></div>
       <button className="new-project" title={t.start} onClick={() => navigate("webora")}><Plus size={17}/>{t.start}</button>
       <div className="nav-label">WORKSPACE</div>
