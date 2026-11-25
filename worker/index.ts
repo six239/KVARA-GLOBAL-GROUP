@@ -138,11 +138,7 @@ export default {
       const language = body.language === "ka" ? "Georgian" : body.language === "ru" ? "Russian" : "English";
       try {
         const result = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
-          prompt: `You are Mamuka Support, the friendly support assistant for Kvara Global Group (KGG). Answer in ${language}. Help users understand KGG features, account basics, website creation, and troubleshooting. Be concise and honest. Do not claim features are connected if they are not. Never ask for passwords, verification codes, or secret API keys. If the issue requires a human administrator, say that a support ticket is needed.\
-\
-User question: ${message}\
-\
-Reply:`,
+          prompt: `You are Mamuka Support, the friendly support assistant for Kvara Global Group (KGG). The user selected ${language}. Write your entire reply ONLY in ${language}; do not switch languages, even if the user message contains another language. Use natural, fluent wording for that language. Help users understand KGG features, account basics, website creation, and troubleshooting. Be concise and honest. Do not claim features are connected if they are not. Never ask for passwords, verification codes, or secret API keys. If the issue requires a human administrator, say that a support ticket is needed.\\n\\nUser question: ${message}\\n\\nReply only in ${language}:`,
           max_tokens: 700, temperature: 0.3
         });
         const reply = typeof result.response === "string" ? result.response.trim() : "";
