@@ -843,3 +843,16 @@ textarea:focus-visible, a:focus-visible {
   }
   .sidebar:not(.collapsed) nav { min-height: 0; }
 }
+
+
+/* Sidebar toggle visibility fix: keep desktop edge control outside the scroll viewport and use the topbar arrow on mobile. */
+@media (min-width: 561px) {
+  .sidebar { overflow: visible !important; }
+  .sidebar nav { min-height: 0; overflow-y: auto; }
+  .mobile-menu { display: none !important; }
+}
+@media (max-width: 560px) {
+  .sidebar-edge-toggle { display: none !important; }
+  .mobile-menu { display: inline-flex !important; align-items: center; justify-content: center; flex: 0 0 42px; width: 42px; height: 42px; }
+  .mobile-menu span { display: block; font: 500 25px/1 Arial, sans-serif; margin-top: -3px; }
+}
