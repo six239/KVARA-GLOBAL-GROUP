@@ -231,7 +231,7 @@ export default function App() {
     </aside>
     <main className="main">
       <header className="topbar">
-        <button className="icon-button mobile-menu" onClick={() => setSidebar(!sidebar)} aria-label="Toggle menu"><Menu size={20}/></button>
+        <button className="icon-button mobile-menu" onClick={() => setSidebar(!sidebar)} aria-label={sidebar ? "Collapse sidebar" : "Expand sidebar"} title={sidebar ? "Collapse sidebar" : "Expand sidebar"}><span>{sidebar ? "<" : ">"}</span></button>
         <div className="crumb">Kvara Global <span>/</span> {t[section]}</div>
         <div className="top-actions"><span className="free-access-label">FREE FOR EVERYONE</span><Globe2 size={16}/><select value={lang} onChange={e => changeLanguage(e.target.value as Lang)} aria-label="Language"><option value="en">English</option><option value="ka">ქართული</option><option value="ru">Русский</option></select><button className="avatar account-avatar" onClick={() => navigate("account")} aria-label="Open account">{account ? account.email.slice(0,1).toUpperCase() : <UserRound size={17}/>}</button></div>
       </header>
