@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import KggTools from "./KggTools";
-import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Upload, Download, RotateCw, Info, UserRound, BadgeCheck, ShieldCheck, LogOut, Building2, Users, ReceiptText, Server, Plug, Trash2, ExternalLink, CheckCircle2 } from "lucide-react";
+import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, Monitor, Activity, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Upload, Download, RotateCw, Info, UserRound, BadgeCheck, ShieldCheck, LogOut, Building2, Users, ReceiptText, Server, Plug, Trash2, ExternalLink, CheckCircle2 } from "lucide-react";
 
 type Lang = "en" | "ka" | "ru";
 type Section = "webora" | "projects" | "upgrader" | "business" | "command" | "workflows" | "drive" | "developer" | "monitor" | "team" | "documents" | "support" | "marketplace" | "security" | "help" | "kvara" | "settings" | "about" | "account";
