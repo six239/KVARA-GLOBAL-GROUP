@@ -218,7 +218,7 @@ export default function App() {
 
   function navigate(next: Section) { setSection(next); if (window.innerWidth <= 560) setSidebar(false); }
 
-  return <div className={`shell flag-bg-${lang}`}>
+  return <div className="shell">
     <svg className="visual-filters" aria-hidden="true" focusable="false">
       <filter id="flag-wave" x="-10%" y="-10%" width="120%" height="120%">
         <feTurbulence type="fractalNoise" baseFrequency="0.008 0.025" numOctaves="2" seed="4" result="noise">
