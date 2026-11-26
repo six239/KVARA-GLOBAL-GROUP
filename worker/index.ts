@@ -1,5 +1,5 @@
 interface AiBinding {
-  run(model: string, input: Record<string, unknown>): Promise<{ response?: string; [key: string]: unknown }>;
+  run(model: string, input: Record<string, unknown>): Promise<{ response?: string; image?: string | Uint8Array; [key: string]: unknown }>;
 }
 
 interface D1Statement {
@@ -127,6 +127,43 @@ export default {
 
     if (url.pathname === "/api/health") {
       return json({ ok: true, service: "Kvara Global Group" });
+    }
+
+    if (url.pathname === "/api/kvara-chat") {
+      if (request.method !== "POST") return json({ error: "Use POST." }, 405);
+      let body: { message?: unknown; language?: unknown; style?: unknown; history?: unknown };
+      try { body = await request.json() as typeof body; } catch { return json({ error: "Invalid JSON." }, 400); }
+      const message = typeof body.message === "string" ? body.message.trim() : "";
+      if (!message || message.length > 4000) return json({ error: "Enter a message under 4,000 characters." }, 400);
+      const language = body.language === "ka" ? "Georgian" : body.language === "ru" ? "Russian" : "English";
+      const style = body.style === "concise" ? "Be concise." : body.style === "detailed" ? "Give detailed, structured explanations." : "Use a balanced level of detail.";
+      const history = Array.isArray(body.history) ? body.history.slice(-12).map((item: any) => ({ role:item?.role==="assistant"?"assistant":"user", text:typeof item?.text==="string"?item.text.slice(0,4000):"" })).filter(item=>item.text) : [];
+      const transcript = history.map(item => (item.role==="assistant"?"Kvara AI: ":"User: ")+item.text).join("\n");
+      try {
+        const result = await env.AI.run("@cf/qwen/qwen3.8-27b", { prompt:`You are Kvara AI, the general-purpose assistant inside Kvara Global Group. Reply entirely in ${language}, unless the user explicitly asks for another language. ${style} Be accurate, useful, and clear. Do not claim access to tools or data that are not connected.\n\nConversation:\n${transcript}\n\nKvara AI:`, max_tokens:1200, temperature:0.4 });
+        const reply = typeof result.response === "string" ? result.response.trim() : "";
+        if (!reply) return json({ error:"Kvara AI returned an empty response. Please try again." },502);
+        return json({ ok:true, reply:reply.slice(0,9000) });
+      } catch { return json({ error:"Kvara AI is temporarily unavailable. Please try again in a moment." },502); }
+    }
+
+    if (url.pathname === "/api/generate-image") {
+      if (request.method !== "POST") return json({ error:"Use POST." },405);
+      let body: { prompt?: unknown };
+      try { body=await request.json() as typeof body; } catch { return json({ error:"Invalid JSON." },400); }
+      const prompt=typeof body.prompt==="string"?body.prompt.trim():"";
+      if(prompt.length<3||prompt.length>1500) return json({error:"Image descriptions must be between 3 and 1,500 characters."},400);
+      try {
+        const result=await env.AI.run("@cf/black-forest-labs/flux-1-schnell",{prompt,steps:4});
+        let base64=typeof result.image==="string"?result.image:"";
+        if(!base64&&result.image instanceof Uint8Array){
+          let binary="";
+          for(let offset=0;offset<result.image.length;offset+=0x8000) binary+=String.fromCharCode(...result.image.subarray(offset,offset+0x8000));
+          base64=btoa(binary);
+        }
+        if(!base64) return json({error:"The image model did not return an image. Please try a different description."},502);
+        return json({ok:true,image:"data:image/png;base64,"+base64});
+      } catch { return json({error:"Image generation is temporarily unavailable. Check Workers AI availability and try again."},502); }
     }
 
     if (url.pathname === "/api/support-chat") {
