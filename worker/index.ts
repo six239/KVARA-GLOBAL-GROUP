@@ -138,13 +138,20 @@ export default {
       const language = body.language === "ka" ? "Georgian" : body.language === "ru" ? "Russian" : "English";
       const style = body.style === "concise" ? "Be concise." : body.style === "detailed" ? "Give detailed, structured explanations." : "Use a balanced level of detail.";
       const history = Array.isArray(body.history) ? body.history.slice(-12).map((item: any) => ({ role:item?.role==="assistant"?"assistant":"user", text:typeof item?.text==="string"?item.text.slice(0,4000):"" })).filter(item=>item.text) : [];
-      const transcript = history.map(item => (item.role==="assistant"?"Kvara AI: ":"User: ")+item.text).join("\n");
+      const messages = [
+        { role: "system", content: `You are Kvara AI, the general-purpose assistant inside Kvara Global Group. Reply entirely in ${language}, unless the user explicitly asks for another language. ${style} Be accurate, useful, and clear. Do not claim access to tools or data that are not connected.` },
+        ...history.map(item => ({ role: item.role, content: item.text }))
+      ];
       try {
-        const result = await env.AI.run("@cf/qwen/qwen3.8-27b", { prompt:`You are Kvara AI, the general-purpose assistant inside Kvara Global Group. Reply entirely in ${language}, unless the user explicitly asks for another language. ${style} Be accurate, useful, and clear. Do not claim access to tools or data that are not connected.\n\nConversation:\n${transcript}\n\nKvara AI:`, max_tokens:1200, temperature:0.4 });
-        const reply = typeof result.response === "string" ? result.response.trim() : "";
+        const result = await env.AI.run("@cf/qwen/qwen3.8-27b", { messages, max_tokens: 1200, temperature: 0.4 });
+        const choiceContent = (result as any)?.choices?.[0]?.message?.content;
+        const reply = typeof result.response === "string" ? result.response.trim() : typeof choiceContent === "string" ? choiceContent.trim() : "";
         if (!reply) return json({ error:"Kvara AI returned an empty response. Please try again." },502);
         return json({ ok:true, reply:reply.slice(0,9000) });
-      } catch { return json({ error:"Kvara AI is temporarily unavailable. Please try again in a moment." },502); }
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : "Unknown Workers AI error";
+        return json({ error:`Kvara AI connection failed: ${detail.slice(0,300)}` },502);
+      }
     }
 
     if (url.pathname === "/api/generate-image") {
@@ -162,7 +169,7 @@ export default {
           base64=btoa(binary);
         }
         if(!base64) return json({error:"The image model did not return an image. Please try a different description."},502);
-        return json({ok:true,image:"data:image/png;base64,"+base64});
+        return json({ok:true,image:"data:image/jpeg;charset=utf-8;base64,"+base64});
       } catch { return json({error:"Image generation is temporarily unavailable. Check Workers AI availability and try again."},502); }
     }
 
