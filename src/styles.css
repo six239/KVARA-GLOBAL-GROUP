@@ -900,3 +900,17 @@ textarea:focus-visible, a:focus-visible {
 .generated-image-result img{display:block;max-width:100%;width:min(100%,720px);height:auto;border-radius:14px;border:1px solid var(--border-color,rgba(150,130,220,.2));}
 .generated-image-result a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 14px;border-radius:10px}
 @media(max-width:600px){.kvara-chat-panel{padding:14px;margin-top:14px}.kvara-chat-history{min-height:220px;max-height:50vh}.kvara-chat-form{flex-direction:column;align-items:stretch}.kvara-chat-form .primary{justify-content:center}.kvara-chat-message{max-width:96%}}
+
+
+/* KGG connection panel for the separate KVARA AI account */
+.kvara-connect-panel{display:flex;flex-direction:column;gap:12px;max-width:460px;margin:18px auto;padding:20px;border:1px solid var(--border-color,rgba(150,130,220,.22));border-radius:16px;background:rgba(120,100,180,.07);}
+.kvara-connect-panel h2{font-size:18px;margin:0 0 4px}
+.kvara-connect-panel label{display:flex;flex-direction:column;gap:6px;font-size:13px;opacity:.9}
+.kvara-connect-panel input{width:100%;min-width:0;padding:12px;border-radius:10px;border:1px solid var(--border-color,rgba(150,130,220,.25));background:rgba(0,0,0,.18);color:inherit;font:inherit}
+.kvara-connect-panel .primary{min-height:44px}
+.kvara-auth-toggle{border:0;background:none;color:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:7px}
+.kvara-connect-panel a{display:inline-flex;align-items:center;justify-content:center;gap:6px;color:inherit;font-size:13px}
+.kvara-connect-panel small{font-size:11px;line-height:1.45;opacity:.65}
+.kvara-disconnect{margin-left:auto;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.kvara-chat-intro{flex-wrap:wrap}
+@media(max-width:560px){.kvara-connect-panel{padding:15px;margin:12px 0}.kvara-disconnect{margin-left:0}}
