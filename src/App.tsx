@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import KggTools from "./KggTools";
 import { Sparkles, FolderOpen, WandSparkles, LifeBuoy, BrainCircuit, Settings, Globe2, Monitor, Activity, ArrowUpRight, Plus, Menu, ChevronDown, Image as ImageIcon, Home, Upload, Download, RotateCw, Info, UserRound, BadgeCheck, ShieldCheck, LogOut, Building2, Users, ReceiptText, Server, Plug, Trash2, ExternalLink, CheckCircle2, Send } from "lucide-react";
 
+const KVARA_API_BASE = "https://kvara-ai-3.kvaraai.workers.dev";
+async function kvaraRequest(path: string, options: RequestInit = {}) {
+  const response = await fetch(KVARA_API_BASE + path, { ...options, credentials: "include", headers: { "Content-Type": "application/json", ...(options.headers || {}) } });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `Kvara AI request failed (${response.status}).`);
+  return data;
+}
+
 type Lang = "en" | "ka" | "ru";
 type Section = "webora" | "projects" | "upgrader" | "business" | "command" | "workflows" | "drive" | "developer" | "monitor" | "team" | "documents" | "support" | "marketplace" | "security" | "help" | "kvara" | "settings" | "about" | "account";
 
@@ -115,6 +123,15 @@ export default function App() {
   const [imagePrompt, setImagePrompt] = useState("");
   const [kvaraInput, setKvaraInput] = useState("");
   const [kvaraBusy, setKvaraBusy] = useState(false);
+  const [kvaraUser, setKvaraUser] = useState<{id:string;email:string}|null>(null);
+  const [kvaraAuthMode, setKvaraAuthMode] = useState<"login"|"register">("login");
+  const [kvaraAuthEmail, setKvaraAuthEmail] = useState("");
+  const [kvaraAuthPassword, setKvaraAuthPassword] = useState("");
+  const [kvaraAuthError, setKvaraAuthError] = useState("");
+  const [kvaraAuthBusy, setKvaraAuthBusy] = useState(false);
+  const [kvaraChatId, setKvaraChatId] = useState("");
+  const [imageDownloading, setImageDownloading] = useState(false);
+
   const [kvaraMessages, setKvaraMessages] = useState<Array<{role:"user"|"assistant";text:string}>>([]);
   const [imageBusy, setImageBusy] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -162,24 +179,56 @@ export default function App() {
   const [authError, setAuthError] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
   useEffect(() => { fetch("/api/auth/me").then(r=>r.json()).then(d=>setAccount(d.user||null)).catch(()=>setAccount(null)); }, []);
+  useEffect(() => {
+    let active = true;
+    kvaraRequest("/api/auth/me").then(data => { if (active) setKvaraUser(data.user || null); }).catch(() => { if (active) setKvaraUser(null); });
+    return () => { active = false; };
+  }, []);
+
   useEffect(() => { if (!account) return; fetch("/api/projects").then(r=>r.ok?r.json():null).then(d=>{ if(d && Array.isArray(d.projects)){ const merged=[...d.projects,...projects.filter(p=>!d.projects.some((q:{id:string})=>q.id===p.id))].slice(0,100); setProjects(merged); localStorage.setItem("webora-projects",JSON.stringify(merged)); } }).catch(()=>{}); }, [account?.id]);
   const t = copy[lang];
 
   function changeLanguage(next: Lang) { setLang(next); localStorage.setItem("kvara-language", next); }
 
+  async function connectKvara(event?: React.FormEvent) {
+    event?.preventDefault();
+    if (!kvaraAuthEmail.trim() || !kvaraAuthPassword) { setKvaraAuthError("Enter your Kvara AI email and password."); return; }
+    setKvaraAuthBusy(true); setKvaraAuthError("");
+    try {
+      const data = await kvaraRequest(`/api/auth/${kvaraAuthMode}`, { method:"POST", body:JSON.stringify({email:kvaraAuthEmail.trim(),password:kvaraAuthPassword}) });
+      setKvaraUser(data.user || null);
+      setKvaraAuthPassword("");
+      setKvaraChatId("");
+      setKvaraMessages([]);
+      if (!data.user) throw new Error("Kvara AI did not return an account session.");
+    } catch(error) {
+      setKvaraAuthError(error instanceof Error ? error.message : "Could not connect to Kvara AI.");
+    } finally { setKvaraAuthBusy(false); }
+  }
+
+  async function disconnectKvara() {
+    try { await kvaraRequest("/api/auth/logout", {method:"POST",body:"{}"}); } catch {}
+    setKvaraUser(null); setKvaraChatId(""); setKvaraMessages([]); setKvaraInput("");
+  }
+
   async function sendKvaraMessage(event?: React.FormEvent) {
     event?.preventDefault();
     const message = kvaraInput.trim();
     if (!message || kvaraBusy) return;
+    if (!kvaraUser) { setKvaraMessages(current=>[...current,{role:"assistant",text:"Connect your Kvara AI account first."}]); return; }
     setKvaraInput("");
-    const next = [...kvaraMessages, { role: "user" as const, text: message }];
-    setKvaraMessages(next);
+    setKvaraMessages(current => [...current, {role:"user",text:message}]);
     setKvaraBusy(true);
     try {
-      const response = await fetch("/api/kvara-chat", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message,language:lang,style:aiResponseStyle,history:next.slice(-12)}) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Kvara AI is temporarily unavailable.");
-      setKvaraMessages(current => [...current,{role:"assistant",text:String(data.reply || "No response was returned.")}]);
+      let chatId = kvaraChatId;
+      if (!chatId) {
+        const created = await kvaraRequest("/api/chats", {method:"POST",body:"{}"});
+        chatId = String(created.id || "");
+        if (!chatId) throw new Error("Kvara AI could not create a conversation.");
+        setKvaraChatId(chatId);
+      }
+      const data = await kvaraRequest("/api/chat", {method:"POST",body:JSON.stringify({chatId,message})});
+      setKvaraMessages(current => [...current,{role:"assistant",text:String(data.answer || "Kvara AI returned an empty response.")}]);
     } catch(error) {
       setKvaraMessages(current => [...current,{role:"assistant",text:error instanceof Error ? error.message : "Kvara AI could not connect. Please try again."}]);
     } finally { setKvaraBusy(false); }
@@ -188,15 +237,28 @@ export default function App() {
   async function generateKvaraImage() {
     const promptText=imagePrompt.trim();
     if(!promptText || imageBusy) return;
+    if(!kvaraUser) { setImageError("Connect your Kvara AI account in the Kvara AI Chat tab first."); return; }
     setImageBusy(true); setImageError(""); setGeneratedImage(null);
     try {
-      const response=await fetch("/api/generate-image",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:promptText})});
-      const data=await response.json();
-      if(!response.ok) throw new Error(data.error || "Image generation failed. Please try again.");
-      if(typeof data.image!=="string" || !data.image.startsWith("data:image/")) throw new Error("The image service returned an invalid image.");
-      setGeneratedImage(data.image);
-    } catch(error) { setImageError(error instanceof Error ? error.message : "Image generation is temporarily unavailable."); }
+      const data=await kvaraRequest("/api/image",{method:"POST",body:JSON.stringify({prompt:promptText})});
+      if(typeof data.url!=="string" || !data.url.startsWith("/api/files/")) throw new Error("Kvara AI returned an invalid image link.");
+      setGeneratedImage(KVARA_API_BASE + data.url);
+    } catch(error) { setImageError(error instanceof Error ? error.message : "Kvara AI image generation is unavailable."); }
     finally { setImageBusy(false); }
+  }
+
+  async function downloadKvaraImage() {
+    if(!generatedImage || imageDownloading) return;
+    setImageDownloading(true);
+    try {
+      const response=await fetch(generatedImage,{credentials:"include"});
+      if(!response.ok) throw new Error("Could not download the generated image.");
+      const blob=await response.blob();
+      const objectUrl=URL.createObjectURL(blob);
+      const link=document.createElement("a"); link.href=objectUrl; link.download="kvara-ai-generated.jpg"; link.click();
+      URL.revokeObjectURL(objectUrl);
+    } catch(error) { setImageError(error instanceof Error ? error.message : "Image download failed."); }
+    finally { setImageDownloading(false); }
   }
 
   async function submitAuth() {
@@ -305,8 +367,9 @@ export default function App() {
         {(["command","workflows","drive","developer","monitor","team","documents","support","marketplace","security"] as Section[]).includes(section) && <KggTools section={section} title={t[section]} language={lang} projectCount={projects.length}/>}
         {section === "help" && <section className="page"><div className="eyebrow">SUPPORT & LEARNING</div><h1>{t.helpTitle}</h1><p className="subtitle">{t.helpSub}</p><div className="help-layout"><div className="help-guide-list">{guides.map(guide => <button key={guide.id} className={helpGuide === guide.id ? "help-guide-button active" : "help-guide-button"} onClick={() => { setHelpGuide(guide.id); setHelpStep(0); }}><LifeBuoy size={17}/><span>{guide.title}</span><ArrowUpRight size={14}/></button>)}</div><div className="help-walkthrough"><div className="walkthrough-meta"><span>{lang === "ka" ? "ეტაპობრივი ინსტრუქცია" : lang === "ru" ? "ПОШАГОВОЕ РУКОВОДСТВО" : "STEP-BY-STEP WALKTHROUGH"}</span><b>{helpStep + 1} / {activeGuide.steps.length}</b></div><div className="walkthrough-progress"><span style={{ width: `${((helpStep + 1) / activeGuide.steps.length) * 100}%` }}/></div><h2>{activeGuide.title}</h2><p className="walkthrough-summary">{activeGuide.summary}</p><div className="walkthrough-current"><span>{String(helpStep + 1).padStart(2, "0")}</span><p>{activeGuide.steps[helpStep]}</p></div><div className="walkthrough-actions"><button className="secondary" disabled={helpStep === 0} onClick={() => setHelpStep(step => Math.max(0, step - 1))}>{lang === "ka" ? "წინა" : lang === "ru" ? "Назад" : "Previous"}</button><button className="primary" onClick={() => setHelpStep(step => step + 1 >= activeGuide.steps.length ? 0 : step + 1)}>{helpStep + 1 === activeGuide.steps.length ? (lang === "ka" ? "თავიდან დაწყება" : lang === "ru" ? "Начать заново" : "Restart guide") : (lang === "ka" ? "შემდეგი ეტაპი" : lang === "ru" ? "Следующий шаг" : "Next step")}</button></div><div className="walkthrough-all-steps"><b>{lang === "ka" ? "ყველა ეტაპი" : lang === "ru" ? "Все шаги" : "All steps"}</b>{activeGuide.steps.map((step, index) => <button key={index} className={index === helpStep ? "walkthrough-step-link active" : "walkthrough-step-link"} onClick={() => setHelpStep(index)}><span>{index + 1}</span>{step}</button>)}</div></div></div></section>}
         {section === "kvara" && <section className="page"><div className="eyebrow">AI ASSISTANT</div><div className="kvara-title-row"><h1>{t.kvaraTitle}</h1><div className="kvara-switcher"><button className="kvara-switch-button" onClick={() => setKvaraMenuOpen(!kvaraMenuOpen)} aria-expanded={kvaraMenuOpen} aria-label="Open Kvara AI tools menu"><ChevronDown size={18}/></button>{kvaraMenuOpen && <div className="kvara-menu"><button onClick={() => {setKvaraView("home");setKvaraMenuOpen(false);}}><Home size={16}/>Kvara AI Chat</button><button onClick={() => {setKvaraView("image");setImageView("creator");setKvaraMenuOpen(false);}}><ImageIcon size={16}/>Image Studio</button></div>}</div></div><p className="subtitle">{t.kvaraSub}</p>
-          {kvaraView === "home" && <div className="kvara-chat-panel"><div className="kvara-chat-intro"><BrainCircuit size={28}/><div><b>Kvara AI</b><p>Ask a question, brainstorm, or get help with a task.</p></div></div><div className="kvara-chat-history" aria-live="polite">{kvaraMessages.length===0?<div className="empty-state"><Sparkles size={26}/><b>What would you like to work on?</b><p>Your message will be sent securely to the KGG AI backend.</p></div>:kvaraMessages.map((item,index)=><article className={"kvara-chat-message "+item.role} key={index}><b>{item.role==="assistant"?"Kvara AI":"You"}</b><p>{item.text}</p></article>)}</div><form className="kvara-chat-form" onSubmit={sendKvaraMessage}><textarea value={kvaraInput} onChange={e=>setKvaraInput(e.target.value)} placeholder="Message Kvara AI…" rows={2} aria-label="Message Kvara AI"/><button className="primary" disabled={kvaraBusy||!kvaraInput.trim()}>{kvaraBusy?"Thinking…":"Send"} <Send size={16}/></button></form><small className="studio-note">AI requests use the KGG Cloudflare Workers AI service. Availability and usage limits depend on the account.</small></div>}
-          {kvaraView === "image" && <div className="image-studio"><div className="studio-tabs"><button className={imageView==="creator"?"studio-tab active":"studio-tab"} onClick={()=>setImageView("creator")}><Sparkles size={15}/>Image Creator</button><button className={imageView==="editor"?"studio-tab active":"studio-tab"} onClick={()=>setImageView("editor")}><WandSparkles size={15}/>Image Editor</button></div>{imageView==="creator"&&<div className="studio-panel"><div className="editor-heading"><Sparkles size={22}/><div><b>Image Creator</b><p>Describe an image and generate it with the connected AI model.</p></div></div><label className="studio-label">Image description</label><textarea className="studio-prompt" value={imagePrompt} onChange={e=>setImagePrompt(e.target.value)} placeholder="Describe the image you want to create…"/>{imageError&&<div className="generation-error" role="alert">{imageError}</div>}{imageBusy&&<div className="studio-note">Generating your image… this may take a little while.</div>}<button className="primary" disabled={!imagePrompt.trim()||imageBusy} onClick={generateKvaraImage}><Sparkles size={16}/>{imageBusy?"Generating…":"Generate image"}</button>{generatedImage&&<div className="generated-image-result"><img src={generatedImage} alt="Generated by Kvara AI"/><a className="secondary" href={generatedImage} download="kvara-ai-generated.png"><Download size={16}/> Download image</a></div>}</div>}{imageView==="editor"&&<div className="image-editor"><div className="editor-heading"><ImageIcon size={22}/><div><b>Image Editor</b><p>Upload an image, adjust it, and download your edit.</p></div></div><label className="upload-image"><Upload size={18}/>Choose an image<input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0];if(file){const reader=new FileReader();reader.onload=()=>{setEditImage(String(reader.result));setBrightness(100);setContrast(100);setSaturation(100);setRotation(0);};reader.readAsDataURL(file);}}}/></label>{editImage&&<><div className="editor-preview"><img src={editImage} alt="Image being edited" style={{filter:`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`,transform:`rotate(${rotation}deg)`}}/></div><div className="editor-controls"><label>Brightness <span>{brightness}%</span><input type="range" min="0" max="200" value={brightness} onChange={e=>setBrightness(Number(e.target.value))}/></label><label>Contrast <span>{contrast}%</span><input type="range" min="0" max="200" value={contrast} onChange={e=>setContrast(Number(e.target.value))}/></label><label>Saturation <span>{saturation}%</span><input type="range" min="0" max="200" value={saturation} onChange={e=>setSaturation(Number(e.target.value))}/></label><button className="secondary" onClick={()=>setRotation((rotation+90)%360)}><RotateCw size={16}/> Rotate 90°</button><button className="primary" onClick={downloadEditedImage}><Download size={16}/> Download edited image</button></div></>}</div>}</div>}</section>}
+          {kvaraView === "home" && <div className="kvara-chat-panel"><div className="kvara-chat-intro"><BrainCircuit size={28}/><div><b>Kvara AI</b><p>{kvaraUser ? `Connected as ${kvaraUser.email}` : "Connect your existing Kvara AI account to use its real chat and image services."}</p></div>{kvaraUser && <button className="secondary kvara-disconnect" onClick={disconnectKvara}><LogOut size={15}/> Disconnect</button>}</div>
+            {!kvaraUser ? <form className="kvara-connect-panel" onSubmit={connectKvara}><h2>{kvaraAuthMode==="login"?"Connect your Kvara AI account":"Create a Kvara AI account"}</h2><label>Email address<input type="email" autoComplete="email" value={kvaraAuthEmail} onChange={e=>setKvaraAuthEmail(e.target.value)} placeholder="you@example.com" required/></label><label>Password<input type="password" autoComplete={kvaraAuthMode==="login"?"current-password":"new-password"} value={kvaraAuthPassword} onChange={e=>setKvaraAuthPassword(e.target.value)} placeholder="Kvara AI password" required/></label>{kvaraAuthError&&<div className="generation-error" role="alert">{kvaraAuthError}</div>}<button className="primary" disabled={kvaraAuthBusy}>{kvaraAuthBusy?"Connecting…":kvaraAuthMode==="login"?"Connect Kvara AI":"Create account & connect"}</button><button type="button" className="kvara-auth-toggle" onClick={()=>{setKvaraAuthMode(v=>v==="login"?"register":"login");setKvaraAuthError("");}}>{kvaraAuthMode==="login"?"Need a Kvara AI account? Register":"Already have an account? Sign in"}</button><a href={KVARA_API_BASE} target="_blank" rel="noreferrer">Open Kvara AI separately <ExternalLink size={13}/></a><small>Your Kvara AI credentials are sent directly to the Kvara AI service. KGG does not store your Kvara AI password.</small></form> : <><div className="kvara-chat-history" aria-live="polite">{kvaraMessages.length===0?<div className="empty-state"><Sparkles size={26}/><b>You're connected to Kvara AI.</b><p>Your messages are saved in your Kvara AI account.</p></div>:kvaraMessages.map((item,index)=><article className={"kvara-chat-message "+item.role} key={index}><b>{item.role==="assistant"?"Kvara AI":"You"}</b><p>{item.text}</p></article>)}</div><form className="kvara-chat-form" onSubmit={sendKvaraMessage}><textarea value={kvaraInput} onChange={e=>setKvaraInput(e.target.value)} placeholder="Message Kvara AI…" rows={2} aria-label="Message Kvara AI"/><button className="primary" disabled={kvaraBusy||!kvaraInput.trim()}>{kvaraBusy?"Thinking…":"Send"} <Send size={16}/></button></form><small className="studio-note">Connected to your existing Kvara AI account and saved conversations.</small></>}</div>}
+          {kvaraView === "image" && <div className="image-studio"><div className="studio-tabs"><button className={imageView==="creator"?"studio-tab active":"studio-tab"} onClick={() => setImageView("creator")}><Sparkles size={15}/>Image Creator</button><button className={imageView==="editor"?"studio-tab active":"studio-tab"} onClick={() => setImageView("editor")}><WandSparkles size={15}/>Image Editor</button></div>{imageView==="creator"&&<div className="studio-panel"><div className="editor-heading"><Sparkles size={22}/><div><b>Image Creator</b><p>Generate images using your connected Kvara AI account.</p></div></div>{!kvaraUser&&<div className="business-note">Connect your Kvara AI account in the Kvara AI Chat tab before generating images. <button className="secondary" onClick={()=>setKvaraView("home")}>Connect account</button></div>}<label className="studio-label">Image description</label><textarea className="studio-prompt" value={imagePrompt} onChange={e=>setImagePrompt(e.target.value)} placeholder="Describe the image you want to create…"/>{imageError&&<div className="generation-error" role="alert">{imageError}</div>}{imageBusy&&<div className="studio-note">Generating your image… this may take a little while.</div>}<button className="primary" disabled={!kvaraUser||!imagePrompt.trim()||imageBusy} onClick={generateKvaraImage}><Sparkles size={16}/>{imageBusy?"Generating…":"Generate image"}</button>{generatedImage&&<div className="generated-image-result"><img crossOrigin="use-credentials" src={generatedImage} alt="Generated by Kvara AI"/><button className="secondary" onClick={downloadKvaraImage} disabled={imageDownloading}><Download size={16}/>{imageDownloading?"Downloading…":"Download image"}</button></div>}</div>}{imageView==="editor"&&<div className="image-editor"><div className="editor-heading"><ImageIcon size={22}/><div><b>Image Editor</b><p>Upload an image, adjust it, and download your edit.</p></div></div><label className="upload-image"><Upload size={18}/>Choose an image<input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0];if(file){const reader=new FileReader();reader.onload=()=>{setEditImage(String(reader.result));setBrightness(100);setContrast(100);setSaturation(100);setRotation(0);};reader.readAsDataURL(file);}}}/></label>{editImage&&<><div className="editor-preview"><img src={editImage} alt="Image being edited" style={{filter:`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`,transform:`rotate(${rotation}deg)`}}/></div><div className="editor-controls"><label>Brightness <span>{brightness}%</span><input type="range" min="0" max="200" value={brightness} onChange={e=>setBrightness(Number(e.target.value))}/></label><label>Contrast <span>{contrast}%</span><input type="range" min="0" max="200" value={contrast} onChange={e=>setContrast(Number(e.target.value))}/></label><label>Saturation <span>{saturation}%</span><input type="range" min="0" max="200" value={saturation} onChange={e=>setSaturation(Number(e.target.value))}/></label><button className="secondary" onClick={()=>setRotation((rotation+90)%360)}><RotateCw size={16}/> Rotate 90°</button><button className="primary" onClick={downloadEditedImage}><Download size={16}/> Download edited image</button></div></>}</div>}</div>}</section>}
         {section === "settings" && <section className="page settings-page">
           <div className="eyebrow">KGG · CONTROL CENTER</div><h1>{t.settingsTitle}</h1><p className="subtitle">Customize your workspace. Preferences are saved on this device.</p>
           <div className="settings-grid">
